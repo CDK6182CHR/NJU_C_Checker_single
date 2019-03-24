@@ -24,7 +24,7 @@ class checkWindow(QtWidgets.QMainWindow):
     def __init__(self,parent=None):
         super().__init__()
         self.name = '南京大学C语言作业批改系统'
-        self.version = 'V2.0.0'
+        self.version = 'V2.0.1'
         self.date = '20190324'
         self.setWindowTitle(f"{self.name} {self.version}")
         self.workDir = '.'
@@ -157,9 +157,15 @@ class checkWindow(QtWidgets.QMainWindow):
         hlayout.addWidget(outEdit)
 
         codeEdit = QtWidgets.QTextEdit()
+        subvlayout = QtWidgets.QVBoxLayout()
+        label = QtWidgets.QLabel('光标位置')
+        self.cursorLabel = label
+        subvlayout.addWidget(label)
+        subvlayout.addWidget(codeEdit)
+        codeEdit.cursorPositionChanged.connect(self.code_cursor_changed)
         self.codeEdit = codeEdit
         QtWidgets.QScroller.grabGesture(self.codeEdit, QtWidgets.QScroller.TouchGesture)
-        hlayout.addWidget(codeEdit)
+        hlayout.addLayout(subvlayout)
         self.highLighter = HighLighter(codeEdit.document())
 
 
@@ -452,7 +458,7 @@ class checkWindow(QtWidgets.QMainWindow):
         try:
             os.chdir(self.workDir)
             for t in os.scandir(self.workDir):
-                if not t.is_dir() and ('.c' in t.name or '.C' in t.name):
+                if not t.is_dir() and ('.c' in t.name or '.C' in t.name) and '.exe' not in t.name:
                     self.fileListWidget.addItem(t.name)
         except Exception as e:
             QtWidgets.QMessageBox.warning(self,'错误','文件夹非法\n'+repr(e))
@@ -617,11 +623,18 @@ class checkWindow(QtWidgets.QMainWindow):
             num = 0
         self.numberEdit.setText(str(t+num))
 
+    def code_cursor_changed(self):
+        cursor = self.codeEdit.textCursor()
+        layout = cursor.block().layout() # QTextLayout
+        lineNum = layout.lineForTextPosition(cursor.block().position()).lineNumber() \
+                  + cursor.block().firstLineNumber()
+        self.cursorLabel.setText(f"{lineNum},{cursor.position()-cursor.block().position()}")
+
     def about(self):
         text = self.name+'  '+self.version+'\n'
         text += self.date + '\n'
         text += '南京大学现代工程与应用科学学院  马兴越\n'
-        text += 'https://github.com/CDK6182CHR/NJU_C_checker_multi'
+        text += 'https://github.com/CDK6182CHR/NJU_C_Checker_single'
         QtWidgets.QMessageBox.about(self,'关于',text)
 
     def closeEvent(self, a0: QtGui.QCloseEvent):

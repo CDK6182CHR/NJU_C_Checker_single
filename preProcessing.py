@@ -47,6 +47,9 @@ def replace_code(source:str)->str:
     fflush = re.findall('(fflush *?\( *?stdin *?\))',source)
     for f in fflush:
         source = source.replace(f,'getchar(/*此语句由批改程序从fflush替换*/)')
+    source=source.replace('scanf("%d",&c);',
+     'scanf("%d" ,&c);\n\t\tprintf("--------------输入命令%d-------------\\n",c);'
+     ' //  **此语句由批改程序添加**')
     return source
 
 def compile_cmd(source:str)->str:
@@ -97,8 +100,42 @@ def read_out(output:QByteArray,cmd:str)->str:
         s = o
     else:
         s = osp[2].strip().rstrip('echo')
-    print("read out",s)
+    s = flush_menu(s)
     s = s.replace('\n','<br>')
     s = s.replace(cmd,
                   f'<span style="color:#0000ff;">$&gt;&nbsp;{cmd.replace("<","&lt;")}</span><br>')
     return s
+
+
+def flush_menu(output: str):
+    """
+    flush version2 with regex
+    """
+    lines = output.split('\n')
+    replace_str = ' **菜单已被批改程序清洗** '
+    menu_lines = []
+    for i, line in enumerate(lines):
+        if re.match('.*?[F,f]un\d+_\d.*', line):
+            menu_lines.append(i)
+
+    # 置一个标志位，每一轮连续的第一个用来放清洗的标志，其他的不处理
+
+    """
+    if menu_lines:  
+        lines[menu_lines[0]]=replace_str
+        del menu_lines[0]
+        for i in reversed(menu_lines):
+            del lines[i]
+            """
+    to_del = []
+    last_menu = -1
+    for i, s in enumerate(menu_lines):
+        if s - last_menu == 1:
+            # 连续的，直接删除
+            to_del.append(s)
+        else:
+            lines[s] = replace_str
+        last_menu = s
+    for i in reversed(to_del):
+        del lines[i]
+    return '\n'.join(lines)
