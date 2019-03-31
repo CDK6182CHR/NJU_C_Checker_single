@@ -5,8 +5,8 @@
 错误代码，原始记录。
 2019.03.12：不再兼容第一次的记录文档。
 """
-source_file = r"D:\个人文件\学习\本科\第4学期\C语言助教\第04次作业\log_pad.txt"
-excel_file = r"D:\个人文件\学习\本科\第4学期\C语言助教\第04次作业\《程序设计》-2017地海-作业批改结果【第4次】.xlsx"
+source_file = r"D:\个人文件\学习\本科\第4学期\C语言助教\第05次作业\log_pad.txt"
+excel_file = r"D:\个人文件\学习\本科\第4学期\C语言助教\第05次作业\《程序设计》-2017地海-作业批改结果【第5次】 .xlsx"
 problem_count = 8  # 题目总数。超过这个数的题号将被忽略
 
 # out_excel = 'source/《程序设计》-2017地海-作业批改结果 【第2次】-out.xlsx'
@@ -72,7 +72,7 @@ def main(source_file,excel_file,error_log,*,num_col=2,start_col=5,problem_count=
             if not file_note or not isinstance(file_note,str):
                 if file_note:
                     print("strange filenote",file_note)
-                file_note = "题目对应源文件|"
+                file_note = "题目对应测试用例文件|"
             newlog = make_problem_file_log(file_note,num,file_name)
             ws.cell(row,total_note_col,value=newlog)
 
@@ -97,7 +97,7 @@ def make_problem_file_log(previous:str,pro_num:int,filename:str)->str:
         num = int(num)
         pro_file_dict[num] = file
     pro_file_dict[pro_num] = filename
-    new = '题目对应源文件|'+'|'.join(map(lambda x:f"{x[0]}:{x[1]}",pro_file_dict.items()))
+    new = '题目对应测试用例文件|'+'|'.join(map(lambda x:f"{x[0]}:{x[1]}",pro_file_dict.items()))
     return new
 
 def find_pos(dir_name:str,file_name:str,num:int,ws,num_col,start_col)->(int,int):

@@ -24,8 +24,8 @@ class checkWindow(QtWidgets.QMainWindow):
     def __init__(self,parent=None):
         super().__init__()
         self.name = '南京大学C语言作业批改系统'
-        self.version = 'V2.0.1'
-        self.date = '20190324'
+        self.version = 'V2.0.2'
+        self.date = '20190331'
         self.setWindowTitle(f"{self.name} {self.version}")
         self.workDir = '.'
         self.examples = []
@@ -49,12 +49,15 @@ class checkWindow(QtWidgets.QMainWindow):
         hlayout = QtWidgets.QHBoxLayout()
 
         btnCheck = QtWidgets.QPushButton('测试(&T)')
+        btnCompile = QtWidgets.QPushButton('编译(&R)')
         btnNext = QtWidgets.QPushButton('下一题(&X)')
         btnSubmit = QtWidgets.QPushButton('提交(&S)')
         btnNextFile = QtWidgets.QPushButton("下一文件(&D)")
         btnNextFile.clicked.connect(self.next_file)
+        btnCompile.clicked.connect(self.compile_clicked)
         self.btnNextFile = btnNextFile
         self.btnSubmit = btnSubmit
+        self.btnCompile = btnCompile
         btn3 = QtWidgets.QPushButton('3分(&3)')
         btn2 = QtWidgets.QPushButton('2分(&2)')
         btn1 = QtWidgets.QPushButton('1分(&1)')
@@ -78,6 +81,7 @@ class checkWindow(QtWidgets.QMainWindow):
         hlayout.addWidget(btnNext)
         hlayout.addWidget(btnSubmit)
         hlayout.addWidget(btnCheck)
+        hlayout.addWidget(btnCompile)
         label = QtWidgets.QLabel('得分(&M)')
         label.setBuddy(line)
         hlayout.addWidget(label)
@@ -135,9 +139,11 @@ class checkWindow(QtWidgets.QMainWindow):
         layout.addLayout(hlayout)
 
         for btn in (btnNext,btnTerminate,btnCheck,btn0,btn1,btn2,btn3,btnUnknown,btnLog,btnFast,btnSubmit,
-                    btnNextFile):
+                    btnNextFile,btnCompile):
             btn.setFixedHeight(50)
             btn.setMinimumWidth(120)
+        for btn in (btn0,btn1,btn2,btn3,btnUnknown):
+            btn.setMinimumWidth(80)
         for btn in (btnAdd,btnMinus):
             btn.setFixedHeight(50)
 
@@ -315,7 +321,13 @@ class checkWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self,'错误','测试当前题目：请先选择题目源文件和测试用例！')
             return
         self.checkAProblem(self.fileListWidget.currentItem().text(),
-                           self.exampleList.currentItem().data(-1),compile=True)
+                           self.exampleList.currentItem().data(-1))
+
+    def compile_clicked(self):
+        if self.fileListWidget.currentItem() is None:
+            QtWidgets.QMessageBox.warning(self,'错误','请先选择源文件！')
+            return
+        self.compileAFile(self.fileListWidget.currentItem().text())
 
     def fast_note(self):
         """
@@ -409,11 +421,12 @@ class checkWindow(QtWidgets.QMainWindow):
         self.fileListWidget.setCurrentRow(self.fileListWidget.currentRow()+1)
         item = self.fileListWidget.currentItem()
 
-        self.exampleList.setCurrentRow(0)
+        if item is not None:
+            self.exampleList.setCurrentRow(0)
 
     def next_clicked(self):
         """
-        下一题. single程序仅切换测试用例文件。
+        下一题. single程序仅切换测试用例文件。这里负责清空outEdit。
         """
         # 先提交上一题的更改
         self.btnSubmit.click()
@@ -432,6 +445,8 @@ class checkWindow(QtWidgets.QMainWindow):
         else:
             status += "||最后一个文件，自动进入下一个文件夹"
             self.btnNextFile.click()
+        self.outEdit.setHtml(self.outEdit.toHtml().split('*************编译结束*************')[0] +
+        '*************编译结束*************<br>')
         self.statusBar().showMessage(status)
         self.noteLine.setText('')
         self.markLine.setText('3')
@@ -469,32 +484,34 @@ class checkWindow(QtWidgets.QMainWindow):
         self.getExamples()
         self.getFastNotes()
 
-    def checkAProblem(self,source:str,examples:list,*,compile=True):
+    def compileAFile(self,source:str):
         """
-        检查一道题，将结果输出到outEdit中。
+        编译一个源文件。
         """
         note = pre_code(source)
         self.outEdit.setText(note)
-        if compile:
-            cmd_single = compile_cmd(source)
-            cp_cmd = shell_cmd(cmd_single)
+        cmd_single = compile_cmd(source)
+        cp_cmd = shell_cmd(cmd_single)
 
-            p = QtCore.QProcess(self)
-            p.start('cmd')
-            p.waitForStarted()
-            p.write(bytes(cp_cmd,'GBK'))
-            p.waitForFinished(2000)
-            out_str = read_out(p.readAllStandardOutput(),cmd_single)
-            out_str += read_out(p.readAllStandardError(),cmd_single)
+        p = QtCore.QProcess(self)
+        p.start('cmd')
+        p.waitForStarted()
+        p.write(bytes(cp_cmd, 'GBK'))
+        p.waitForFinished(2000)
+        out_str = read_out(p.readAllStandardOutput(), cmd_single)
+        out_str += read_out(p.readAllStandardError(), cmd_single)
 
-            self.outEdit.setHtml(self.outEdit.toHtml()+
-                                 '*************编译开始*************<br>'+out_str+
-                                 '<br>*************编译结束*************<br>')
-        else:
-            self.outEdit.setHtml(self.outEdit.toHtml() +
-                                 '*************跳过编译步骤*************<br>')
+        self.outEdit.setHtml(self.outEdit.toHtml() +
+                             '*************编译开始*************<br>' + out_str +
+                             '<br>*************编译结束*************<br>')
         # 编译结束，更新窗口一次
         QtCore.QCoreApplication.processEvents()
+
+    def checkAProblem(self,source:str,examples:list):
+        """
+        检查一道题，将结果输出到outEdit中。
+        将除了编译信息以外的输出信息全部清空。
+        """
         popenThread = PopenThread(source,self.workDir,examples)
         self.popenThread = popenThread
         popenThread.CheckFinished.connect(self.check_finished)
@@ -503,8 +520,10 @@ class checkWindow(QtWidgets.QMainWindow):
 
     # slots
     def check_finished(self,example,output_str):
+        print("main::check_finished")
         self.outEdit.setHtml(self.outEdit.toHtml()
         + f'<br><span style="color:#008000;">---------测试用例 {example}---------</span><br>' + output_str)
+        print("main::check_finished:ok")
 
     def check_all_finished(self):
         self.outEdit.setHtml(self.outEdit.toHtml()
@@ -515,6 +534,7 @@ class checkWindow(QtWidgets.QMainWindow):
         由fileListWidget切换触发。在single中事实上应该是file_changed.
         """
         if item is not None:
+            self.compileAFile(item.text())
             try:
                 self.exampleList.setCurrentRow(0)  # 这一步会调用checkAProblem
             except:

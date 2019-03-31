@@ -93,10 +93,10 @@ def read_out(output:QByteArray,cmd:str)->str:
         print("cannot decode output")
         return "Decode error"
 
-    print("read out before split",o)
+    # print("read out before split",o)
     osp = o.split('==================Python_C_checker_split_line=====================')
     if len(osp) < 3:
-        print("意外的输出内容",o)
+        print("意外的输出内容")
         s = o
     else:
         s = osp[2].strip().rstrip('echo')
