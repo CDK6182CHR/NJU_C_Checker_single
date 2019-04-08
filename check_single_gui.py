@@ -24,8 +24,8 @@ class checkWindow(QtWidgets.QMainWindow):
     def __init__(self,parent=None):
         super().__init__()
         self.name = '南京大学C语言作业批改系统'
-        self.version = 'V2.0.2'
-        self.date = '20190331'
+        self.version = 'V2.0.3'
+        self.date = '20190408'
         self.setWindowTitle(f"{self.name} {self.version}")
         self.workDir = '.'
         self.examples = []
@@ -196,6 +196,9 @@ class checkWindow(QtWidgets.QMainWindow):
         btnRefresh.clicked.connect(self.refresh_workdir)
         self.btnRefresh = btnRefresh
         dirEdit.editingFinished.connect(btnRefresh.click)
+        btnBegin = QtWidgets.QPushButton('开始(&B)')
+        btnBegin.clicked.connect(self.begin_clicked)
+        toolBar.addWidget(btnBegin)
         toolBar.addWidget(btnRefresh)
 
         self.addToolBar(toolBar)
@@ -413,6 +416,12 @@ class checkWindow(QtWidgets.QMainWindow):
         self.noteLine.setText('')
         self.markLine.setText('3')
 
+    def begin_clicked(self):
+        """
+        工具栏开始键，直接选择第一个文件即可
+        """
+        self.fileListWidget.setCurrentRow(0)
+
     def next_file(self):
         """
         下一文件。先调用提交逻辑。
@@ -497,7 +506,7 @@ class checkWindow(QtWidgets.QMainWindow):
         p.start('cmd')
         p.waitForStarted()
         p.write(bytes(cp_cmd, 'GBK'))
-        p.waitForFinished(2000)
+        p.waitForFinished()  # 取消编译时间限制
         out_str = read_out(p.readAllStandardOutput(), cmd_single)
         out_str += read_out(p.readAllStandardError(), cmd_single)
 
