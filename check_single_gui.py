@@ -24,8 +24,8 @@ class checkWindow(QtWidgets.QMainWindow):
     def __init__(self,parent=None):
         super().__init__()
         self.name = '南京大学C语言作业批改系统'
-        self.version = 'V2.0.3'
-        self.date = '20190408'
+        self.version = 'V2.0.4'
+        self.date = '20190413'
         self.setWindowTitle(f"{self.name} {self.version}")
         self.workDir = '.'
         self.examples = []
@@ -506,6 +506,7 @@ class checkWindow(QtWidgets.QMainWindow):
         p.start('cmd')
         p.waitForStarted()
         p.write(bytes(cp_cmd, 'GBK'))
+        p.write(bytes('exit\n','GBK'))
         p.waitForFinished()  # 取消编译时间限制
         out_str = read_out(p.readAllStandardOutput(), cmd_single)
         out_str += read_out(p.readAllStandardError(), cmd_single)
