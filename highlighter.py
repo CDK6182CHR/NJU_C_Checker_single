@@ -23,6 +23,7 @@ class HighLighter(QSyntaxHighlighter):
         BUILTINS = ["printf", "scanf"]
         CONSTANTS = ["false", "true", "NULL", "nullptr",
                      "EOF"]
+        FUNCS = ['fact','sort','bsearch','movesort','combine']  # 新增。每次作业可以修改，需要特别高亮的函数名。
         HighLighter.Rules.append((QRegExp(
             "|".join([r"\b%s\b" % keyword for keyword in KEYWORDS])),
                                         "keyword"))
@@ -32,6 +33,9 @@ class HighLighter(QSyntaxHighlighter):
         HighLighter.Rules.append((QRegExp(
             "|".join([r"\b%s\b" % constant
                       for constant in CONSTANTS])), "constant"))
+        HighLighter.Rules.append((QRegExp(
+            "|".join([r"\b%s\b" % constant
+                      for constant in FUNCS])), "func"))
         HighLighter.Rules.append((QRegExp(
             r"\b[+-]?[0-9]+[lL]?\b"
             r"|\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\b"
@@ -71,6 +75,9 @@ class HighLighter(QSyntaxHighlighter):
         format = QTextCharFormat(baseFormat)
         format.setBackground(QColor(Qt.yellow))
         HighLighter.Formats['problem']=format
+        format = QTextCharFormat(baseFormat)
+        format.setBackground(QColor(0,162,232))
+        HighLighter.Formats['func']=format
 
     def highlightBlock(self, text):
         NORMAL, TRIPLESINGLE, TRIPLEDOUBLE, ERROR = range(4)

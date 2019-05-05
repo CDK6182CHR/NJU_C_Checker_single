@@ -5,9 +5,9 @@
 错误代码，原始记录。
 2019.03.12：不再兼容第一次的记录文档。
 """
-source_file = r"D:\个人文件\学习\本科\第4学期\C语言助教\第06次作业\log_pad.txt"
-excel_file = r"D:\个人文件\学习\本科\第4学期\C语言助教\第06次作业\《程序设计》-2017地海-作业批改结果【第6次】.xlsx"
-problem_count = 8  # 题目总数。超过这个数的题号将被忽略
+source_file = r"D:\个人文件\学习\本科\第4学期\C语言助教\第10次作业\工作区10\log.txt"
+excel_file = r"D:\个人文件\学习\本科\第4学期\C语言助教\第10次作业\《程序设计》-2017地海-作业批改结果【第10次】.xlsx"
+problem_count = 6  # 题目总数。超过这个数的题号将被忽略
 
 # out_excel = 'source/《程序设计》-2017地海-作业批改结果 【第2次】-out.xlsx'
 import openpyxl
@@ -138,4 +138,7 @@ def numFromDirName(name:str)->str:
     return nums[0]
 
 if __name__ == '__main__':
+    print("批改记录转Excel程序启动，等待10秒确认")
+    import time
+    time.sleep(10)
     main(source_file,excel_file,error_log,problem_count=problem_count,start_time=None)
