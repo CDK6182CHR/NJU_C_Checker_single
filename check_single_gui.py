@@ -24,8 +24,8 @@ class checkWindow(QtWidgets.QMainWindow):
     def __init__(self,parent=None):
         super().__init__()
         self.name = '南京大学C语言作业批改系统'
-        self.version = 'V2.0.5'
-        self.date = '20190505'
+        self.version = 'V2.0.6'
+        self.date = '20190512'
         self.setWindowTitle(f"{self.name} {self.version}")
         self.workDir = '.'
         self.examples = []
@@ -49,7 +49,7 @@ class checkWindow(QtWidgets.QMainWindow):
         hlayout = QtWidgets.QHBoxLayout()
 
         btnCheck = QtWidgets.QPushButton('测试(&T)')
-        btnCompile = QtWidgets.QPushButton('编译(&R)')
+        btnCompile = QtWidgets.QPushButton('编译(&Z)')
         btnNext = QtWidgets.QPushButton('下一题(&X)')
         btnSubmit = QtWidgets.QPushButton('提交(&S)')
         btnNextFile = QtWidgets.QPushButton("下一文件(&D)")
@@ -116,7 +116,7 @@ class checkWindow(QtWidgets.QMainWindow):
 
         hlayout = QtWidgets.QHBoxLayout()
 
-        btnTerminate = QtWidgets.QPushButton('中止(&A)')
+        btnTerminate = QtWidgets.QPushButton('中止(&Q)')
         btnTerminate.clicked.connect(self.terminate_test)
         hlayout.addWidget(btnNextFile)
         hlayout.addWidget(btnTerminate)
