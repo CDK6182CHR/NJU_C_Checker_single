@@ -50,6 +50,13 @@ def replace_code(source:str)->str:
     source=source.replace('scanf("%d",&c);',
      'scanf("%d" ,&c);\n\t\tprintf("--------------输入命令%d-------------\\n",c);'
      ' //  **此语句由批改程序添加**')
+    filename_list = re.findall(r'("\D:\\\\\D\.txt")', source)
+    for filename in filename_list:
+        letter = re.findall(r'(\D)\.txt', filename)[0]
+        mark = '"'
+        print("replace", filename, f'"{letter}.txt" /*此路径由批改程序替换，原路径为{filename.strip(mark)}*/ ')
+        source = source.replace(filename, f'"{letter}.txt" /*此路径由批改程序替换，原路径为{filename.strip(mark)}*/ ')
+
     return source
 
 def compile_cmd(source:str)->str:

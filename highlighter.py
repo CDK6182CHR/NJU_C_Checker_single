@@ -23,7 +23,7 @@ class HighLighter(QSyntaxHighlighter):
         BUILTINS = ["printf", "scanf"]
         CONSTANTS = ["false", "true", "NULL", "nullptr",
                      "EOF"]
-        FUNCS = ['deldigit','insert','count','conver','find','deletestr','FindNoVowel','sort']
+        FUNCS = ['main','create','display','copylist','merge','del']
         # 新增。每次作业可以修改，需要特别高亮的函数名。
         HighLighter.Rules.append((QRegExp(
             "|".join([r"\b%s\b" % keyword for keyword in KEYWORDS])),

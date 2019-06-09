@@ -5,6 +5,7 @@ from PyQt5.QtCore import QThread,pyqtSignal,QProcess,QByteArray
 from PyQt5.QtWidgets import QMessageBox
 import os,re
 from preProcessing import shell_cmd,run_cmd,read_out
+from postPrecessing import verify_file
 
 class PopenThread(QThread):
     CheckFinished = pyqtSignal(str,str)
@@ -35,6 +36,9 @@ class PopenThread(QThread):
             # print("output is",output)
             self.CheckFinished.emit(example,read_out(output,cmd_single)+
                                     read_out(p.readAllStandardError(),cmd_single))
+        t = verify_file('c.std.txt','c.txt')
+        self.CheckFinished.emit('文件比较',t)
+        os.system('del c.txt')
         self.AllFinished.emit()
 
     def terminate(self):
