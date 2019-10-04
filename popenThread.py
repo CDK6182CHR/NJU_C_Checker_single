@@ -36,9 +36,10 @@ class PopenThread(QThread):
             # print("output is",output)
             self.CheckFinished.emit(example,read_out(output,cmd_single)+
                                     read_out(p.readAllStandardError(),cmd_single))
-        t = verify_file('c.std.txt','c.txt')
-        self.CheckFinished.emit('文件比较',t)
-        os.system('del c.txt')
+        # 以下三行代码仅限于最后一次作业
+        # t = verify_file('c.std.txt','c.txt')
+        # self.CheckFinished.emit('文件比较',t)
+        # os.system('del c.txt')
         self.AllFinished.emit()
 
     def terminate(self):

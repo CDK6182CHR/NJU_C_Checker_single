@@ -24,8 +24,8 @@ class checkWindow(QtWidgets.QMainWindow):
     def __init__(self,parent=None):
         super().__init__()
         self.name = '南京大学C语言作业批改系统'
-        self.version = 'V2.0.9'
-        self.date = '20190609'
+        self.version = 'V2.0.10'
+        self.date = '20191004'
         self.setWindowTitle(f"{self.name} {self.version}")
         self.workDir = '.'
         self.examples = []
@@ -558,6 +558,7 @@ class checkWindow(QtWidgets.QMainWindow):
             self.outEdit.setHtml(self.outEdit.toHtml() + '<br>' + note)
             with open(name, encoding='GBK', errors='ignore') as fp:
                 self.codeEdit.setText(fp.read())
+            self.setWindowTitle(f"{self.name}  {self.version}  进度{self.fileListWidget.currentRow()}/{self.fileListWidget.count()}")
 
 
     def example_changed(self,item:QtWidgets.QListWidgetItem):
@@ -595,10 +596,11 @@ class checkWindow(QtWidgets.QMainWindow):
         num_logs = []
         from log2excel import numFromDirName
 
-        pro = QtWidgets.QProgressDialog(self)
-        pro.setWindowTitle('正在读取')
-        pro.setLabelText('正在读取文件')
-        pro.setRange(0,0)
+        # pro = QtWidgets.QProgressDialog(self)
+        # pro.setWindowTitle('正在读取')
+        # pro.setLabelText('正在读取文件')
+        # pro.setRange(0,1)
+        # pro.setValue(1)
         with open(self.log_file,'r',encoding='utf-8',errors='ignore') as fp:
             for line in fp:
                 # line尾巴上带了\n
@@ -609,7 +611,7 @@ class checkWindow(QtWidgets.QMainWindow):
                     dir_logs.append(line)
                 elif numFromDirName(data[0]) == numFromDirName(curdir):
                     num_logs.append(line)
-        pro.close()
+        # pro.close()
 
         dialog = QtWidgets.QDialog(self)
         dialog.setWindowTitle('本地记录')
